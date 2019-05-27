@@ -37,7 +37,7 @@ import java.net.SocketAddress;
  * <li>the {@linkplain ChannelConfig configuration parameters} of the channel (e.g. receive buffer size),</li>
  * <li>the I/O operations that the channel supports (e.g. read, write, connect, and bind), and</li>
  * <li>the {@link ChannelPipeline} which handles all I/O events and requests
- *     associated with the channel.</li>
+ * associated with the channel.</li>
  * </ul>
  *
  * <h3>All I/O operations are asynchronous.</h3>
@@ -73,6 +73,24 @@ import java.net.SocketAddress;
  * It is important to call {@link #close()} or {@link #close(ChannelPromise)} to release all
  * resources once you are done with the {@link Channel}. This ensures all resources are
  * released in a proper way, i.e. filehandles.
+ * 在 Netty 中, Channel 是一个 Socket 的抽象
+ * 它为用户提供了关于 Socket 状态(是否是连接还是断开) 以及对 Socket 的读写等操作
+ * <p>
+ * 除了 TCP 协议以外, Netty 还支持很多其他的连接协议, 并且每种协议还有 NIO(异步 IO) 和
+ * OIO(Old-IO, 即传统的阻塞 IO) 版本的区别. 不同协议不同的阻塞类型的连接都有不同的 Channel
+ * 类型与之对应
+ * <p>
+ * 下面是一些常用的 Channel 类型:
+ * - NioSocketChannel, 代表异步的客户端 TCP Socket 连接.
+ * - NioServerSocketChannel, 异步的服务器端 TCP Socket 连接.
+ * - NioDatagramChannel, 异步的 UDP 连接
+ * - NioSctpChannel, 异步的客户端 Sctp 连接.
+ * - NioSctpServerChannel, 异步的 Sctp 服务器端连接.
+ * - OioSocketChannel, 同步的客户端 TCP Socket 连接.
+ * - OioServerSocketChannel, 同步的服务器端 TCP Socket 连接.
+ * - OioDatagramChannel, 同步的 UDP 连接
+ * - OioSctpChannel, 同步的 Sctp 服务器端连接.
+ * - OioSctpServerChannel, 同步的客户端 TCP Socket 连接.
  */
 public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparable<Channel> {
 
@@ -90,7 +108,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * Returns the parent of this channel.
      *
      * @return the parent channel.
-     *         {@code null} if this channel does not have a parent channel.
+     * {@code null} if this channel does not have a parent channel.
      */
     Channel parent();
 
@@ -126,7 +144,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * information.
      *
      * @return the local address of this channel.
-     *         {@code null} if this channel is not bound.
+     * {@code null} if this channel is not bound.
      */
     SocketAddress localAddress();
 
@@ -137,12 +155,12 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * information.
      *
      * @return the remote address of this channel.
-     *         {@code null} if this channel is not connected.
-     *         If this channel is not connected but it can receive messages
-     *         from arbitrary remote addresses (e.g. {@link DatagramChannel},
-     *         use {@link DatagramPacket#recipient()} to determine
-     *         the origination of the received message as this method will
-     *         return {@code null}.
+     * {@code null} if this channel is not connected.
+     * If this channel is not connected but it can receive messages
+     * from arbitrary remote addresses (e.g. {@link DatagramChannel},
+     * use {@link DatagramPacket#recipient()} to determine
+     * the origination of the received message as this method will
+     * return {@code null}.
      */
     SocketAddress remoteAddress();
 
@@ -198,12 +216,12 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * are only provided to implement the actual transport, and must be invoked from an I/O thread except for the
      * following methods:
      * <ul>
-     *   <li>{@link #localAddress()}</li>
-     *   <li>{@link #remoteAddress()}</li>
-     *   <li>{@link #closeForcibly()}</li>
-     *   <li>{@link #register(EventLoop, ChannelPromise)}</li>
-     *   <li>{@link #deregister(ChannelPromise)}</li>
-     *   <li>{@link #voidPromise()}</li>
+     * <li>{@link #localAddress()}</li>
+     * <li>{@link #remoteAddress()}</li>
+     * <li>{@link #closeForcibly()}</li>
+     * <li>{@link #register(EventLoop, ChannelPromise)}</li>
+     * <li>{@link #deregister(ChannelPromise)}</li>
+     * <li>{@link #voidPromise()}</li>
      * </ul>
      */
     interface Unsafe {
@@ -242,7 +260,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
          * Connect the {@link Channel} of the given {@link ChannelFuture} with the given remote {@link SocketAddress}.
          * If a specific local {@link SocketAddress} should be used it need to be given as argument. Otherwise just
          * pass {@code null} to it.
-         *
+         * <p>
          * The {@link ChannelPromise} will get notified once the connect operation was complete.
          */
         void connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise);
